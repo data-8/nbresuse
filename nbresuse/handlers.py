@@ -3,12 +3,19 @@ import psutil
 from notebook.utils import url_path_join
 from notebook.base.handlers import IPythonHandler
 
-def get_metrics():
+def rss():
     cur_process = psutil.Process()
     all_processes = [cur_process] + cur_process.children(recursive=True)
-    rss = sum([p.memory_info().rss for p in all_processes])
+    return sum([p.memory_info().rss for p in all_processes])
+
+def cgroup_memory_limit():
+    m = open('/sys/fs/cgroup/memory/memory.limit_in_bytes').read().strip()
+    return int(m)
+
+def get_metrics():
     return {
-        'rss': rss,
+        'rss': rss(),
+        'cgroup_memory_limit': cgroup_memory_limit(),
     }
 
 
